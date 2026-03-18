@@ -1,26 +1,31 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import io from "socket.io-client";
 
 const colors = {
   X: "red",
   O: "blue"
 };
 
+const socket = io("http://localhost:5000");
+
 function App() {
 
   const [board, setBoard] = useState(Array(9).fill(""));
   const [player, setPlayer] = useState("X");
 
+  useEffect(() => {
+
+    socket.on("boardUpdate", (newBoard) => {
+      setBoard(newBoard);
+  });
+
+}, []);
+
   const handleClick = (index) => {
 
-    if(board[index] !== "") return;
+  socket.emit("makeMove", index);
 
-    const newBoard = [...board];
-    newBoard[index] = player;
-
-    setBoard(newBoard);
-
-    setPlayer(player === "X" ? "O" : "X");
-  };
+};
 
   const checkWinner = () => {
 
